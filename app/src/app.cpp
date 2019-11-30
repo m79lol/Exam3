@@ -2,7 +2,7 @@
 //
 
 #include <iostream>
-#include <hash_server.h>
+#include <hasher/hasher.h>
 
 int main() {
   try {

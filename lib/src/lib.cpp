@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <picosha2.h>
-#include <hash_server.h>
+#include <hasher/hasher.h>
 
 Connection::Connection(boost::asio::io_context& ioContext)
   : m_socket(ioContext) {}
