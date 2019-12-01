@@ -16,8 +16,10 @@ void Connection::doWork() {
   boost::asio::async_read_until(
     m_socket, m_buf, "\n", 
     [this, self](boost::system::error_code ec, std::size_t received) {
-      std::cout << "async_read_until -> " << ec.message() << "\n";
+#ifdef DEBUG
+      std::cout << "async_read_until: " << ec.message() << "\n";
       std::cout << "received: " << received << std::endl;
+#endif
       
       std::istream is(&m_buf);
       std::string sourceString;
@@ -27,8 +29,10 @@ void Connection::doWork() {
       std::string hexStr = picosha2::hash256_hex_string(sourceString);
       hexStr += "\n";
 
+#ifdef DEBUG      
       std::cout << "message: " << sourceString << std::endl;
       std::cout << "hash: " << hexStr << std::endl;
+#endif
       
       m_socket.write_some(boost::asio::buffer(hexStr.c_str(), hexStr.size()));
 

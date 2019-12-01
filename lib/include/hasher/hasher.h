@@ -4,7 +4,7 @@
 #define __HASH_SERVER_h
 
 #ifdef _WIN32
-  #ifdef DLL_API_EXPORT
+  #ifdef libhash_server_EXPORTS
     #define DLL_API __declspec(dllexport)
   #else
     #define DLL_API __declspec(dllimport)
