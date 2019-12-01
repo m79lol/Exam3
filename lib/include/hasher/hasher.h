@@ -16,6 +16,11 @@
 #include <memory>
 #include <boost/asio.hpp>
 
+class DLL_API Hash  {
+public:
+  static std::string calculate(const std::string &source);
+};
+
 using boost::asio::ip::tcp;
 
 class DLL_API Connection : public std::enable_shared_from_this<Connection> {
