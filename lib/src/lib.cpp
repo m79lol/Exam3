@@ -3,6 +3,12 @@
 #include <picosha2.h>
 #include <hasher/hasher.h>
 
+#ifdef _WIN32
+  const std::string delimeter = "\r\n";
+#elif __linux__
+  const std::string delimeter = "\n";
+#endif
+
 std::string Hash::calculate(const std::string &source) {
   return picosha2::hash256_hex_string(source);
 }
@@ -18,7 +24,7 @@ void Connection::doWork() {
   auto self(shared_from_this());
 
   boost::asio::async_read_until(
-    m_socket, m_buf, "\r\n", 
+    m_socket, m_buf, delimeter, 
     [this, self](boost::system::error_code ec, std::size_t received) {
 #ifdef DEBUG
       std::cout << "async_read_until: " << ec.message() << "\n";
@@ -33,11 +39,13 @@ void Connection::doWork() {
       std::string sourceString;
       std::getline(is, sourceString);
 
+#ifdef _WIN32
       sourceString.erase(sourceString.end() - 1);
+#endif
       std::string hexStr = Hash::calculate(sourceString);
-      hexStr += "\r\n";
+      hexStr += delimeter;
 
-#ifdef DEBUG      
+#ifdef DEBUG
       std::cout << "message: " << sourceString << std::endl;
       std::cout << "hash: " << hexStr << std::endl;
 #endif

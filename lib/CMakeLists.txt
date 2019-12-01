@@ -1,4 +1,4 @@
-project(libhash_server)
+project(hash_server_lib)
 
 ###########################
 # Targets

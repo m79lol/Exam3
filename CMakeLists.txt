@@ -5,6 +5,7 @@ project(hash_server)
 # Config
 ###########################
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+set(CMAKE_CXX_STANDARD 14)
 project(${PROJECT_NAME} LANGUAGES CXX)
 enable_testing()
 
