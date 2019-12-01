@@ -1,10 +1,5 @@
 project(libhash_server)
 
-# Packages
-set(Boost_USE_MULTITHREADED TRUE)
-set(Boost_USE_STATIC_LIBS FALSE)
-find_package(Boost 1.66.0 REQUIRED system)
-
 ###########################
 # Targets
 ###########################

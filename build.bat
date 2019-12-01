@@ -1,18 +1,53 @@
 @echo on
 
 rmdir /S /Q .\build .\install
+if %errorlevel% neq 0 GOTO exit
 mkdir build
+if %errorlevel% neq 0 GOTO exit
 cd .\build
+if %errorlevel% neq 0 GOTO exit
 mkdir debug release
+if %errorlevel% neq 0 GOTO exit_from_build
 
 cd .\debug
-cmake -DCMAKE_INSTALL_PREFIX:PATH=..\..\install -DBOOST_LIBRARYDIR:PATH=..\..\..\libraries\3rdparty\boost\stage\lib -DBOOST_ROOT:PATH=..\..\..\libraries\3rdparty\boost -DCMAKE_BUILD_TYPE=Debug -G Ninja ..\..
+if %errorlevel% neq 0 GOTO exit_from_build
+cmake -DCMAKE_INSTALL_PREFIX:PATH=..\..\install -DBOOST_LIBRARYDIR:PATH=..\..\libraries\3rdparty\boost\stage\lib -DBOOST_ROOT:PATH=..\..\libraries\3rdparty\boost -DCMAKE_BUILD_TYPE=Debug -G Ninja ..\..
+if %errorlevel% neq 0 GOTO exit_from_subconfig
 ninja -v
-ninja install
+if %errorlevel% neq 0 GOTO exit_from_subconfig
+ninja -v test
+if %errorlevel% neq 0 GOTO exit_from_subconfig
+ninja -v install
+if %errorlevel% neq 0 GOTO exit_from_subconfig
 cd ..
+if %errorlevel% neq 0 GOTO exit_from_build
 
 cd .\release
-cmake -DCMAKE_INSTALL_PREFIX:PATH=..\..\install -DBOOST_LIBRARYDIR:PATH=..\..\..\libraries\3rdparty\boost\stage\lib -DBOOST_ROOT:PATH=..\..\..\libraries\3rdparty\boost -DCMAKE_BUILD_TYPE=Release -G Ninja ..\..
+if %errorlevel% neq 0 GOTO exit_from_build
+cmake -DCMAKE_INSTALL_PREFIX:PATH=..\..\install -DBOOST_LIBRARYDIR:PATH=..\..\libraries\3rdparty\boost\stage\lib -DBOOST_ROOT:PATH=..\..\libraries\3rdparty\boost -DCMAKE_BUILD_TYPE=Release -G Ninja ..\..
+if %errorlevel% neq 0 GOTO exit_from_subconfig
 ninja -v
-ninja install
-cd ..\..
+if %errorlevel% neq 0 GOTO exit_from_subconfig
+ninja -v test
+if %errorlevel% neq 0 GOTO exit_from_subconfig
+ninja -v install
+if %errorlevel% neq 0 GOTO exit_from_subconfig
+cd ../..
+if %errorlevel% neq 0 GOTO exit
+
+rem copy /Y C:\rcml_project\libraries\3rdparty\boost\stage\lib\boost_unit_test_framework-vc141-mt-x32-1_66.dll C:\rcml_project\examples\Exam3\install\bin\boost_unit_test_framework-vc141-mt-x32-1_66.dll
+rem if %errorlevel% neq 0 GOTO exit
+rem copy /Y C:\rcml_project\libraries\3rdparty\boost\stage\lib\boost_system-vc141-mt-x32-1_66.dll C:\rcml_project\examples\Exam3\install\bin\boost_system-vc141-mt-x32-1_66.dll
+rem if %errorlevel% neq 0 GOTO exit
+
+GOTO exit
+
+:exit_from_subconfig
+  cd ..
+
+:exit_from_build
+  cd ..
+  
+:exit
+  exit /b %errorlevel%
+
