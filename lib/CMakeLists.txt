@@ -19,7 +19,7 @@ add_library(sub::lib ALIAS ${PROJECT_NAME})
 target_compile_definitions(${PROJECT_NAME}
   PRIVATE DLL_API_EXPORT
 )
-set_target_properties(${PROJECT} PROPERTIES
+set_target_properties(${PROJECT_NAME} PROPERTIES
   DEBUG_POSTFIX "_debug"
 )
 

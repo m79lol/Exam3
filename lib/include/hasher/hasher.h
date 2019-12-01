@@ -10,7 +10,7 @@
     #define DLL_API __declspec(dllimport)
   #endif
 #else
-  #define RCML_SDK_API
+  #define DLL_API
 #endif
 
 #include <memory>

@@ -10,7 +10,7 @@ add_executable(${PROJECT_NAME}
 ###########################
 # Properties
 ###########################
-set_target_properties(${PROJECT} PROPERTIES
+set_target_properties(${PROJECT_NAME} PROPERTIES
   DEBUG_POSTFIX "_debug"
 )
 
