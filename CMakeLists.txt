@@ -7,6 +7,25 @@ project(hash_server)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 set(CMAKE_CXX_STANDARD 14)
 project(${PROJECT_NAME} LANGUAGES CXX)
+
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY
+  ${PROJECT_BINARY_DIR}/output
+  CACHE PATH
+  "Single Directory for all"
+)
+
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY
+  ${PROJECT_BINARY_DIR}/output
+  CACHE PATH
+  "Single Directory for all"
+)
+
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+  ${PROJECT_BINARY_DIR}/output
+  CACHE PATH
+  "Single Directory for all"
+)
+
 enable_testing()
 
 ###########################

@@ -15,6 +15,8 @@ cmake -DCMAKE_INSTALL_PREFIX:PATH=..\..\install -DBOOST_LIBRARYDIR:PATH=..\..\li
 if %errorlevel% neq 0 GOTO exit_from_subconfig
 ninja -v
 if %errorlevel% neq 0 GOTO exit_from_subconfig
+ninja -v test
+if %errorlevel% neq 0 GOTO exit_from_subconfig
 ninja -v install
 if %errorlevel% neq 0 GOTO exit_from_subconfig
 cd ..
@@ -25,6 +27,8 @@ if %errorlevel% neq 0 GOTO exit_from_build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=..\..\install -DBOOST_LIBRARYDIR:PATH=..\..\libraries\3rdparty\boost\stage\lib -DBOOST_ROOT:PATH=..\..\libraries\3rdparty\boost -DCMAKE_BUILD_TYPE=Release -G Ninja ..\..
 if %errorlevel% neq 0 GOTO exit_from_subconfig
 ninja -v
+if %errorlevel% neq 0 GOTO exit_from_subconfig
+ninja -v test
 if %errorlevel% neq 0 GOTO exit_from_subconfig
 ninja -v install
 if %errorlevel% neq 0 GOTO exit_from_subconfig

@@ -38,6 +38,7 @@ mkdir build
 cd .\build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=<install_path> -DBOOST_LIBRARYDIR:PATH=<boost_libs_path> -DBOOST_ROOT:PATH=<boost_path> -G Ninja ..
 ninja
+ninja test
 ninja install
 ~~~
 ##### linux
@@ -46,6 +47,7 @@ mkdir build
 cd ./build
 cmake -DBoost_NO_SYSTEM_PATHS=TRUE -DCMAKE_INSTALL_PREFIX:PATH=<install_path> -DBOOST_LIBRARYDIR:PATH=<boost_libs_path> -DBOOST_ROOT:PATH=<boost_path> -G Ninja ..
 ninja
+ninja test
 ninja install
 ~~~
 
