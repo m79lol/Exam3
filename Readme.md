@@ -1,15 +1,16 @@
 # Hash Server
-Hash Server is async TCP server, that receive string with end line char specified for current platform (Windows/Linux) as delimiter and send SHA256 hash of that string also with delimiter at end line.
-The server implemented as shared library. Also repository included example server app &  test app based on boost unit test framework.
-Used generator is CMake, build system - ninja.
+Hash Server is an asynchronous TCP server that receives platform-specific strings with the end of line delimiter specified for the current platform (Windows/Linux), and sends back a SHA256 hash of the received string with the same end-of-line delimiter.
+The server is implemented as a shared library. The repository also includes an example server app and a test app based on boost unit test framework.
+Build generator - CMake, build system - ninja.
 
-## Dependicies
+
+## Dependencies
 - [Boost](https://www.boost.org/) (at least 1.66 version)
 - [PicoSHA2](https://github.com/okdshin/PicoSHA2)
 - [CMake](https://cmake.org/) (at least 3.13)
 - [ninja-build](https://ninja-build.org/) (at least 1.5)
 
-## Tested
+## Tested on
 - Windows 10, MSVC 2017 
 - Linux (Ubuntu 16.04), gcc 5.2
 
@@ -18,7 +19,7 @@ Used generator is CMake, build system - ninja.
 `git clone --recursive https://github.com/m79lol/Exam3.git`
 
 ### Build Boost
-Run follow commands at boost folder:
+Run follow commands at the boost folder:
 ##### windows
 ~~~
 .\booststrap.bat
@@ -32,7 +33,7 @@ Run follow commands at boost folder:
 
 ### Build Hash Server
 ##### windows
-Run follows commands from **Developer Command Prompt for VS**:
+Run follow commands from **Developer Command Prompt for VS**:
 ~~~
 mkdir build
 cd .\build
@@ -52,9 +53,9 @@ ninja install
 ~~~
 
 ## Run
-The listening port by default is **6767**
+The default listening port is 6767
 ##### windows
-Start **telnet** and input follow to connect to the server: `open localhost 6767`
+Start **telnet** and input the following to connect to the server: `open localhost 6767`
 ##### linux
 Run `netcat localhost 6767`
 Then you can write strings and send by Enter key.
