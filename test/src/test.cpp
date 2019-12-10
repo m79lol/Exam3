@@ -69,7 +69,7 @@ public:
     std::string hexStr;
     std::getline(is, hexStr);
     if (shift > 1) {
-      hexStr.erase(hexStr.end() - shift);
+      hexStr.erase(hexStr.end() - (shift - 1));
     }
     m_buf.consume(received);
 
