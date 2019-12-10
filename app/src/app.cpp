@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <cstring>
 #include <HashServer/HashServer.h>
 
 void printHelp() {
