@@ -1,4 +1,4 @@
-project(hash_server_tests)
+project(tests)
 
 ###########################
 # Targets

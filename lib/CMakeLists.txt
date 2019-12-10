@@ -1,10 +1,11 @@
-project(hash_server_lib)
+project(HashServer)
 
 ###########################
 # Targets
 ###########################
 add_library(${PROJECT_NAME} SHARED 
-  "src/lib.cpp"
+  "src/HashServer.cpp"
+  "src/HashServerImp.cpp"
 )
 add_library(sub::lib ALIAS ${PROJECT_NAME})
 
@@ -20,8 +21,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 ###########################
 target_include_directories(${PROJECT_NAME}
   PUBLIC $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
-  PRIVATE $<BUILD_INTERFACE:${CMAKE_HOME_DIRECTORY}/PicoSHA2>
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_HOME_DIRECTORY}/PicoSHA2>
   PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   PUBLIC $<INSTALL_INTERFACE:include>
 )
 

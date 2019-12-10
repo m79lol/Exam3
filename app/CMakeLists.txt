@@ -1,4 +1,4 @@
-project(hash_server_app)
+project(app)
 
 ###########################
 # Targets

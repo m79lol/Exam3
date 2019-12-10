@@ -1,10 +1,18 @@
 #define BOOST_TEST_MODULE hash_server_tests
+#define BOOST_TEST_DYN_LINK 1
 
 #include <boost/test/unit_test.hpp>
-
 #include <iostream>
+#include <stdio.h>
+#include <picosha2.h>
+#include <HashServerImp.h>
 
-#include <hasher/hasher.h>
+#ifdef _WIN32
+  const std::string delimiter = "\r\n";
+#elif __linux__
+  const std::string delimiter = "\n";
+#endif
+const std::size_t shift = delimiter.length() - 1;
 
 std::string getRandomString(const size_t &size) {
   static const char alphanum[] =
@@ -39,26 +47,37 @@ public:
 
     boost::asio::connect(m_socket, m_endpoints, ec);
   }
-  
-  std::string retrieve(std::string source) {
+
+  void send(std::string source, const bool &addEOL = true) {
     boost::system::error_code error;
-    source += "\r\n";
+    if (addEOL) {
+      source += delimiter;
+    }
     boost::asio::write(m_socket, boost::asio::buffer(source), error);
-    
+  }
+
+  std::string recieve() {
     boost::asio::streambuf buf;
-    boost::asio::read_until(m_socket, buf, "\r\n");
-    
+    boost::asio::read_until(m_socket, buf, delimiter);
+
     std::istream is(&buf);
     std::string hexStr;
     std::getline(is, hexStr);
     hexStr.erase(hexStr.end() - 1);
-    
+
     return hexStr;
+  }
+  
+  std::string retrieve(std::string source, const bool &addEOL = true) {
+    send(source, addEOL);
+    return recieve();
   }
   
 };
 
 BOOST_AUTO_TEST_SUITE(hash_server_tests)
+
+ 
 
   BOOST_AUTO_TEST_CASE(PlusTest) {
     BOOST_CHECK_EQUAL(1 + 2, 3);
@@ -76,7 +95,7 @@ BOOST_AUTO_TEST_SUITE(hash_server_tests)
   
   BOOST_AUTO_TEST_CASE(HashPredefinedTest) {
     for (auto iHash : predefinedHashes) {
-      const std::string calculated = Hash::calculate(iHash.first);
+      const std::string calculated = picosha2::hash256_hex_string(iHash.first);
       const std::string predefined = iHash.second;
       BOOST_CHECK_EQUAL(calculated, predefined);
     }
@@ -85,29 +104,33 @@ BOOST_AUTO_TEST_SUITE(hash_server_tests)
   BOOST_AUTO_TEST_CASE(HashRandomTest) {
     for (int i = 0; i < 10; ++i) {
       const std::string source = getRandomString(100);
-      const std::string calculated = Hash::calculate(source);
-      const std::string hash = Hash::calculate(source);
+      const std::string calculated = picosha2::hash256_hex_string(source);
+      const std::string hash = picosha2::hash256_hex_string(source);
       BOOST_CHECK_EQUAL(calculated, hash); // dzen of equality
     }
   }
   
   BOOST_AUTO_TEST_CASE(ServerPredefinedTest) {
-    boost::asio::io_context ioContext;
     const int serverPort = 6767;
+    HashServer::Pointer server = HashServer::create(serverPort);
+    server->start(1);
     
-    std::thread thrServer(
-      [&ioContext, serverPort]() mutable -> void {
-        try {
-          HashServer server(ioContext, serverPort);
-          ioContext.run();
-        }
-        catch (std::exception& e) {
-          std::cerr << e.what() << std::endl;
-        }
-      }
-    );
-  
+    boost::asio::io_context ioContext;
     HashClient client(ioContext, serverPort);
+    {
+      std::string longSource = "";
+      for (auto iHash : predefinedHashes) {
+        longSource += iHash.first + delimiter;
+      }
+      client.send(longSource, false);
+
+      for (auto iHash : predefinedHashes) {
+        std::string recived = client.recieve();
+        BOOST_CHECK_EQUAL(recived, iHash.second);
+      }
+    }
+
+
     for (auto iHash : predefinedHashes) {
       const std::string retrived = client.retrieve(iHash.first);
       const std::string predefined = iHash.second;
@@ -120,68 +143,54 @@ BOOST_AUTO_TEST_SUITE(hash_server_tests)
     std::cin >> i;*/
     
     ioContext.stop();
-    thrServer.join();
+    server->stop();
   }
   
   BOOST_AUTO_TEST_CASE(ServerRandomTest) {
-    boost::asio::io_context ioContext;
     const int serverPort = 6767;
+    HashServer::Pointer server = HashServer::create(serverPort);
+    server->start(4);
     
-    std::thread thrServer(
-      [&ioContext, serverPort]() mutable -> void {
-        try {
-          HashServer server(ioContext, serverPort);
-          ioContext.run();
-        }
-        catch (std::exception& e) {
-          std::cerr << e.what() << std::endl;
-        }
-      }
-    );
-    
+    boost::asio::io_context ioContext;
     HashClient client(ioContext, serverPort);
     for (int i = 0; i < 10; ++i) {
       const std::string source = getRandomString(100);
-      const std::string calculated = Hash::calculate(source);
+      const std::string calculated = picosha2::hash256_hex_string(source);
       const std::string retrived = client.retrieve(source);
       BOOST_CHECK_EQUAL(calculated, retrived);
     }
     
     ioContext.stop();
-    thrServer.join();
+    server->stop();
   }
 
   BOOST_AUTO_TEST_CASE(ServerStressTest) {
-    boost::asio::io_context ioContext;
     const int serverPort = 6767;
+    HashServer::Pointer server = HashServer::create(serverPort);
 
-    std::thread thrServer(
-      [&ioContext, serverPort]() mutable -> void {
-      try {
-        HashServer server(ioContext, serverPort);
-        ioContext.run();
-      }
-      catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-      }
-    }
-    );
+    unsigned int threadsCount = std::thread::hardware_concurrency();
+    threadsCount = threadsCount ? threadsCount : 1;
+    server->start(threadsCount);
 
     std::vector<std::shared_ptr<std::thread>> threads;
-
+    boost::asio::io_context ioContext;
     for (int k = 0; k < 10; ++k) {
       threads.push_back(
         std::shared_ptr<std::thread>(new std::thread(
           [&ioContext, serverPort]() mutable -> void {
             HashClient client(ioContext, serverPort);
+
+            std::vector<std::pair<std::string, std::string>> hashes = {};
+            static const size_t size = 1024 * 256 * 10;
             for (int i = 0; i < 10; ++i) {
-
-              const size_t size = 1024;
-
               const std::string source = getRandomString(size);
-              const std::string calculated = Hash::calculate(source);
-              const std::string retrived = client.retrieve(source);
-              BOOST_CHECK_EQUAL(calculated, retrived);
+              const std::string calculated = picosha2::hash256_hex_string(source);
+              hashes.push_back(std::make_pair(source, calculated));
+            }
+
+            for (auto iHash : hashes) {
+              const std::string retrived = client.retrieve(iHash.first);
+              BOOST_CHECK_EQUAL(iHash.second, retrived);
             }
           }
         ))
@@ -193,7 +202,7 @@ BOOST_AUTO_TEST_SUITE(hash_server_tests)
     }
 
     ioContext.stop();
-    thrServer.join();
+    server->stop();
   }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -53,7 +53,7 @@ ninja install
 ~~~
 
 ## Run
-The default listening port is 6767
+Just run `app` or `app --help`.
 ##### windows
 Start **telnet** and input the following to connect to the server: `open localhost 6767`
 ##### linux
